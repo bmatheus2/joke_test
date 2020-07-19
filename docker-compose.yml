@@ -9,7 +9,7 @@ services:
       - 8888:8000
     # environment:
     volumes:
-      - ./joke_test:/srv
+      - ./joke_test:/srv/app
   # db:
   #   image: mysql:5.7
   #   restart: always

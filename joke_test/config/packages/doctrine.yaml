@@ -11,7 +11,7 @@ doctrine:
         auto_mapping: true
         dql:
             numeric_functions:
-                Rand: AppBundle\Doctrine2\Rand
+                Random: AppBundle\Doctrine2\Random
         mappings:
             App:
                 is_bundle: false
