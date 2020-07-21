@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\JokeRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=JokeRepository::class)
@@ -18,6 +19,8 @@ class Joke
     private $id;
 
     /**
+     * @Assert\NotBlank
+     * @Assert\Length(min=5, max=255)
      * @ORM\Column(type="string", length=255)
      */
     private $content;
@@ -32,10 +35,11 @@ class Joke
         return $this->content;
     }
 
-    public function setContent(string $content): self
+    public function setContent($content): self
     {
         $this->content = $content;
 
         return $this;
     }
+
 }

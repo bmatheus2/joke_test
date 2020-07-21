@@ -1,7 +1,7 @@
 version: '3.1'
 
 services:
-  symfony:
+  app:
     build:
       context: ./build/Symfony
     restart: always
@@ -9,17 +9,9 @@ services:
       - 8888:8000
     # environment:
     volumes:
+      - ./joke_test:/srv/app
+  node:
+    image: node:10.21.0-alpine3.9
+    volumes:
       - ./joke_test:/srv
-  # db:
-  #   image: mysql:5.7
-  #   restart: always
-  #   environment:
-  #     MYSQL_DATABASE: exampledb
-  #     MYSQL_USER: exampleuser
-  #     MYSQL_PASSWORD: examplepass
-  #     MYSQL_RANDOM_ROOT_PASSWORD: '1'
-  #   volumes:
-  #     - db:/var/lib/mysql
-
-# volumes:
-  # db:
+    working_dir: /srv

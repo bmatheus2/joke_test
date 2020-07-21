@@ -9,7 +9,7 @@ use Doctrine\ORM\Query\{
   SqlWalker
 };
 
-class Rand extends FunctionNode
+class Random extends FunctionNode
 {
 
     public function parse(Parser $parser)
@@ -21,7 +21,7 @@ class Rand extends FunctionNode
 
     public function getSql(SqlWalker $sqlWalker)
     {
-        return 'RAND()';
+        return 'RANDOM()';
     }
 
 }
