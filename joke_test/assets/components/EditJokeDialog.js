@@ -9,7 +9,7 @@ import {
 } from '@material-ui/core';
 import axios from 'axios';
 
-export default function EditJokeDialog({ joke, onClose, onSave, showEditDialog }) {
+export default function EditJokeDialog({ joke, onClose, onError, onSave, showEditDialog }) {
 
     const [jokeId, setJokeId] = useState(null);
     const [jokeText, setJokeText] = useState('');
@@ -18,11 +18,18 @@ export default function EditJokeDialog({ joke, onClose, onSave, showEditDialog }
         if(joke) {
             setJokeId(joke.id);
             setJokeText(joke.content);
-        } else {
-            setJokeId(null);
-            setJokeText('');
         }
     }, [joke]);
+
+    useEffect(() => {
+        if(!showEditDialog) {
+            // Clear after modal fadeout animation complete
+            setTimeout(() => {
+                setJokeId(null);
+                setJokeText('');
+            }, 200);
+        }
+    }, [showEditDialog]);
 
     const dialogTitle = () => {
         return (jokeId) ? `Editing Joke ${jokeId}` : 'Add New Joke';
@@ -33,10 +40,17 @@ export default function EditJokeDialog({ joke, onClose, onSave, showEditDialog }
     }
 
     const save = async () => {
-        const res = await axios.post(endpoint(), {
-            content: jokeText
-        });
-        onSave();
+        try {
+            const { data } = await axios.post(endpoint(), {
+                content: jokeText
+            });
+            onSave(data.data.id);
+        } catch(e) {
+            console.log(e);
+            if (e.response) {
+             onError(e.response);
+           }
+        }
     }
 
     const endpoint = () => {

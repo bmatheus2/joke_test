@@ -62,6 +62,7 @@ export default function Jokes() {
   const [snackbarText, setSnackbarText] = useState('');
   const [snackbarType, setSnackbarType] = useState('info');
   const [totalPages, setTotalPages] = useState(0);
+  const [updating, setUpdating] = useState(true);
 
   useEffect(() => {
       getJokes();
@@ -85,6 +86,7 @@ export default function Jokes() {
       const { data } = res.data;
       setJokes(data.jokes);
       setTotalPages(data.total_pages);
+      setUpdating(false);
   }
 
   const queryParams = () => {
@@ -111,6 +113,7 @@ export default function Jokes() {
   }
 
   const deleteJoke = async (joke) => {
+      setUpdating(true);
       const res = await axios.delete(`/joke/${joke.id}`);
       showAlert(`Deleted Joke ${joke.id}`, 'warning');
       getJokes();
@@ -134,18 +137,24 @@ export default function Jokes() {
   const handleDialogClose = (e) => {
       setEditDialog(false);
       setTimeout(() => {
-          setJoke(null)
+          setJoke(null);
       }, 300);
   }
 
-  const handleDialogSave = () => {
-      showAlert(`Saved Joke ${joke.id}`, 'success');
+  const handleDialogSave = (newJokeId) => {
+      setUpdating(true);
+      showAlert(`Saved Joke ${newJokeId}`, 'success');
       handleDialogClose();
       getJokes();
   }
 
   const handlePageChange = (e, page) => {
       setPage(page);
+  }
+
+  const onEditError = (e) => {
+      showAlert(`Error status ${e.status}, check console for more details.`, 'error');
+      console.error(e.data.errors);
   }
 
   const searchAction = () => {
@@ -219,17 +228,17 @@ export default function Jokes() {
                 primary={joke.content} style={{paddingRight: '50px'}}
               />
               <ListItemSecondaryAction>
-                 <IconButton aria-label="edit" onClick={() => editJoke(joke)}>
+                 <IconButton aria-label="edit" disabled={updating} onClick={() => editJoke(joke)}>
                   <EditIcon />
                 </IconButton>
-                <IconButton edge="end" aria-label="delete" onClick={() => deleteJoke(joke)}>
+                <IconButton edge="end" aria-label="delete" disabled={updating} onClick={() => deleteJoke(joke)}>
                   <DeleteIcon color="secondary" />
                 </IconButton>
               </ListItemSecondaryAction>
             </ListItem>
         })}
         </List>
-        <EditJokeDialog joke={joke} showEditDialog={showEditDialog} onClose={handleDialogClose} onSave={handleDialogSave} />
+        <EditJokeDialog joke={joke} onError={onEditError} showEditDialog={showEditDialog} onClose={handleDialogClose} onSave={handleDialogSave} />
         <RandomJokeDialog showRandomJokeDialog={showRandomJokeDialog} onClose={handleRandomJokeClose} />
         <hr />
         <Pagination count={totalPages} page={page} onChange={handlePageChange} />

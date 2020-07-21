@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\{ Request, Response };
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use App\Entity\Joke;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -97,11 +97,10 @@ class JokeController extends AbstractController
             $joke = new Joke;
             $joke->setContent($data['content']);
 
-            $errors = $validator->validate($joke);
-
+            $errors = $validator->validate($joke);;
             if (count($errors) > 0) {
                 $errorsString = (string) $errors;
-                return new Response($errorsString);
+                return $this->json(['errors' => $errorsString], Response::HTTP_BAD_REQUEST);
             }
 
             $em = $this->getDoctrine()->getManager();
@@ -110,14 +109,14 @@ class JokeController extends AbstractController
         }
 
         return $this->json([
-            'data' => $data
+            'data' => $joke
         ], 200);
     }
 
     /**
     * @Route("/joke/{id}", name="joke_edit", methods="POST")
     */
-    public function edit(Request $request, int $id)
+    public function edit(Request $request, ValidatorInterface $validator, int $id)
     {
         $joke = $this->getDoctrine()
                              ->getRepository(Joke::class)
@@ -127,6 +126,12 @@ class JokeController extends AbstractController
 
         if(array_key_exists('content', $data) && $data['content'] != '') {
             $joke->setContent($data['content']);
+
+            $errors = $validator->validate($joke);;
+            if (count($errors) > 0) {
+                $errorsString = (string) $errors;
+                return $this->json(['errors' => $errorsString], Response::HTTP_BAD_REQUEST);
+            }
 
             $em = $this->getDoctrine()->getManager();
             $em->persist($joke);

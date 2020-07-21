@@ -15,6 +15,7 @@ export default function RandomJokeDialog({ onClose, showRandomJokeDialog }) {
     const [joke, setJoke] = useState(null);
 
     useEffect(() => {
+        // Load joke initially and on close to prevent content pop in modal
         if(!showRandomJokeDialog) {
             getRandomJoke();
         }
