@@ -35,7 +35,7 @@ export default function RandomJokeDialog({ onClose, showRandomJokeDialog }) {
 
     const getRandomJoke = async () => {
         const res = await axios.get('/joke/random');
-        setJoke(res.data.data);
+        setJoke(res.data);
     }
 
     return (

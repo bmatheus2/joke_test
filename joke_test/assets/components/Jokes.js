@@ -82,8 +82,7 @@ export default function Jokes() {
 
   const getJokes = async (ignoreParams = false) => {
       const params = (ignoreParams) ? {} : queryParams();
-      const res = await axios.get('/joke/list', params);
-      const { data } = res.data;
+      const { data } = await axios.get('/joke/list', params);
       setJokes(data.jokes);
       setTotalPages(data.total_pages);
       setUpdating(false);
@@ -152,7 +151,7 @@ export default function Jokes() {
       setPage(page);
   }
 
-  const onEditError = (e) => {
+  const onError = (e) => {
       showAlert(`Error status ${e.status}, check console for more details.`, 'error');
       console.error(e.data.errors);
   }
@@ -166,10 +165,15 @@ export default function Jokes() {
   }
 
   const searchById = async (id) => {
-      const { data } = await getSingleJoke(id);
-      setJokes([data.data]);
-      setTotalPages(1);
-      setPage(1);
+      try {
+          const { data } = await getSingleJoke(id);
+          setJokes([data]);
+          setTotalPages(1);
+          setPage(1);
+      } catch(e) {
+          console.log(e.response);
+          onError(e.response);
+      }
   }
 
   const showRandomJoke = () => {
@@ -238,7 +242,7 @@ export default function Jokes() {
             </ListItem>
         })}
         </List>
-        <EditJokeDialog joke={joke} onError={onEditError} showEditDialog={showEditDialog} onClose={handleDialogClose} onSave={handleDialogSave} />
+        <EditJokeDialog joke={joke} onError={onError} showEditDialog={showEditDialog} onClose={handleDialogClose} onSave={handleDialogSave} />
         <RandomJokeDialog showRandomJokeDialog={showRandomJokeDialog} onClose={handleRandomJokeClose} />
         <hr />
         <Pagination count={totalPages} page={page} onChange={handlePageChange} />

@@ -1,0 +1,114 @@
+openapi: 3.0.0
+info:
+  title: 'Joke API'
+  version: 0.0.1
+paths:
+  /joke/list:
+    get:
+      parameters:
+        -
+          name: search
+          in: query
+          description: 'Search string for querying jokes'
+          required: false
+          schema:
+            type: string
+        -
+          name: page
+          in: query
+          description: 'Query results page number'
+          required: false
+          schema:
+            type: integer
+        -
+          name: per-page
+          in: query
+          description: 'Number of jokes returned per page'
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'Returns a joke object by id'
+  /joke/random:
+    get:
+      operationId: 'App\Controller\JokeController::random'
+      responses:
+        '200':
+          description: 'Returns a random joke object'
+  '/joke/{id}':
+    get:
+      operationId: 'App\Controller\JokeController::show'
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'The id of the joke'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'Returns a joke object by id'
+        '404':
+          description: 'Returns an array containing an error message'
+    post:
+      operationId: 'App\Controller\JokeController::edit'
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'The id of the joke'
+          required: true
+          schema:
+            type: integer
+        -
+          name: content
+          in: query
+          description: 'Content for new joke'
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Creates a new joke object'
+        '400':
+          description: 'Returns an array containing an error message'
+  /joke:
+    post:
+      parameters:
+        -
+          name: content
+          in: query
+          description: 'Content for new joke'
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Creates a new joke object'
+        '400':
+          description: 'Returns an array containing an error message'
+  '/joke{id}':
+    delete:
+      operationId: 'App\Controller\JokeController::delete'
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'The id of the joke'
+          required: true
+          schema:
+            type: integer
+        -
+          name: content
+          in: query
+          description: 'Content for new joke'
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Deletes joke by id, returns array with deleted id'
+        '404':
+          description: 'Returns an array containing an error message'
