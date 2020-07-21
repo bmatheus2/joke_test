@@ -44,7 +44,7 @@ export default function EditJokeDialog({ joke, onClose, onError, onSave, showEdi
             const { data } = await axios.post(endpoint(), {
                 content: jokeText
             });
-            onSave(data.data.id);
+            onSave(data.id);
         } catch(e) {
             console.log(e);
             if (e.response) {
