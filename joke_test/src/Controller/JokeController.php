@@ -7,6 +7,8 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use App\Entity\Joke;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+
 
 class JokeController extends AbstractController
 {
@@ -40,6 +42,7 @@ class JokeController extends AbstractController
 
         $jokesQuery = $jokesQuery->setMaxResults($limit)
                                  ->setFirstResult($offset)
+                                 ->orderBy('j.id', 'DESC')
                                  ->getQuery();
 
         $paginator = new Paginator($jokesQuery);
@@ -86,14 +89,25 @@ class JokeController extends AbstractController
     /**
     * @Route("/joke", name="joke_new", methods="POST")
     */
-    public function new(array $data)
+    public function new(Request $request, ValidatorInterface $validator)
     {
-        $joke = new Joke;
-        $joke->setContent($request->query->get('content'));
+        $data = json_decode($request->getContent(), true);
 
-        $em = $this->getDoctrine()->getManager();
-        $em->persist($joke);
-        $em->flush();
+        if(array_key_exists('content', $data) && $data['content'] != '') {
+            $joke = new Joke;
+            $joke->setContent($data['content']);
+
+            $errors = $validator->validate($joke);
+
+            if (count($errors) > 0) {
+                $errorsString = (string) $errors;
+                return new Response($errorsString);
+            }
+
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($joke);
+            $em->flush();
+        }
 
         return $this->json([
             'data' => $data
@@ -105,14 +119,19 @@ class JokeController extends AbstractController
     */
     public function edit(Request $request, int $id)
     {
-        $joke = $joke = $this->getDoctrine()
+        $joke = $this->getDoctrine()
                              ->getRepository(Joke::class)
                              ->find($id);
-        $joke->setContent($request->query->get('content'));
 
-        $em = $this->getDoctrine()->getManager();
-        $em->persist($joke);
-        $em->flush();
+        $data = json_decode($request->getContent(), true);
+
+        if(array_key_exists('content', $data) && $data['content'] != '') {
+            $joke->setContent($data['content']);
+
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($joke);
+            $em->flush();
+        }
 
         return $this->json([
             'data' => $joke

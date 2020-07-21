@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Repository\JokeRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
  * @ORM\Entity(repositoryClass=JokeRepository::class)
@@ -37,5 +39,10 @@ class Joke
         $this->content = $content;
 
         return $this;
+    }
+
+    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    {
+        $metadata->addPropertyConstraint('content', new NotBlank());
     }
 }
